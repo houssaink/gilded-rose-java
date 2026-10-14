@@ -18,8 +18,11 @@ sourceCompatibility = '1.8'
 
 test {
     useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+    }
 }
-
 task texttest(type: JavaExec) {
     main = "com.gildedrose.TexttestFixture"
     classpath = sourceSets.test.runtimeClasspath
