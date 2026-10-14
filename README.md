@@ -11,8 +11,6 @@ Refactoring of the Gilded Rose legacy code, plus the new **Conjured** items feat
 
 `main` is the main deliverable. `strategy-pattern` is an alternative showing how the code could evolve if many more item types appeared. Both pass the same tests.
 
-> This branch requires Java 17 or higher (arrow-style `switch`). `main` keeps the original Java 8 setup.
-
 ## How to run the tests
 
 ```
