@@ -9,46 +9,50 @@ class GildedRose {
         this.items = items;
     }
 
+    private static final String SULFURAS = "Sulfuras, Hand of Ragnaros";
+    private static final String BACKSTAGE_TAFKA_CONCERT = "Backstage passes to a TAFKAL80ETC concert";
+    private static final String AGED_BRIE = "Aged Brie";
+    private static final String CONJURED = "conjured";
+
     public void updateQuality() {
         for (Item item : items) {
-            if (item.name.equals("Sulfuras, Hand of Ragnaros")) {
+            if (item.name.equals(SULFURAS)) {
                 continue;
             }
-            if (item.name.equals("Backstage passes to a TAFKAL80ETC concert")) {
-                if (item.sellIn > 0) {
-                    this.manageConcert(item);
+            item.sellIn = item.sellIn - 1;
+            if (item.name.equals(BACKSTAGE_TAFKA_CONCERT)) {
+                if (item.sellIn >= 0) {
+                    this.upgradeQualityConcert(item);
                 } else {
                     item.quality = 0;
                 }
-                item.sellIn = item.sellIn - 1;
+
+            } else if (item.name.equals(AGED_BRIE)) {
+                this.upgradeQuality(item);
             } else {
-                item.sellIn = item.sellIn - 1;
-                if (item.name.equals("Aged Brie")) {
-                    this.upgradeItem(item);
-                } else {
-                    this.degradeItem(item);
-                }
+                this.degradeQuality(item);
             }
+
         }
     }
 
 
-    private void upgradeItem(Item item) {
+    private void upgradeQuality(Item item) {
         int qualityGained = item.sellIn < 0 ? 2 : 1;
         item.quality = Math.min(50, item.quality + qualityGained);
 
     }
 
-    private void degradeItem(Item item) {
-        int qualityLost = item.name.toLowerCase(Locale.ROOT).contains("conjured")
+    private void degradeQuality(Item item) {
+        int qualityLost = item.name.toLowerCase(Locale.ROOT).contains(CONJURED)
             ? (item.sellIn < 0 ? 4 : 2)
             : (item.sellIn < 0 ? 2 : 1);
         item.quality = Math.max(0, item.quality - qualityLost);
     }
 
 
-    private void manageConcert(Item item) {
-        int upgradeQuality = item.sellIn < 6 ? 3 : item.sellIn < 11 ? 2 : 1;
-        item.quality = Math.min(50, item.quality + upgradeQuality);
+    private void upgradeQualityConcert(Item item) {
+        int qualityGained = item.sellIn < 5 ? 3 : item.sellIn < 10 ? 2 : 1;
+        item.quality = Math.min(50, item.quality + qualityGained);
     }
 }
