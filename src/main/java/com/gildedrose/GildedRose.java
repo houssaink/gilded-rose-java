@@ -2,6 +2,7 @@ package com.gildedrose;
 
 import java.util.Locale;
 
+
 class GildedRose {
     Item[] items;
 
@@ -14,45 +15,30 @@ class GildedRose {
     private static final String AGED_BRIE = "Aged Brie";
     private static final String CONJURED = "conjured";
 
+    private static final ItemUpdater STANDARD_UPDATER = new BasicDegradingUpdater(1, 2);
+    private static final ItemUpdater CONJURED_UPDATER = new BasicDegradingUpdater(2, 2);
+    private static final ItemUpdater AGED_BRIE_UPDATER = new BasicUpgradingUpdater(1, 2);
+    private static final ItemUpdater BACKSTAGE_CONCERT_UPDATER = new ConcertUpgradingUpdater();
+    private static final ItemUpdater SULFURAS_UPDATER = new NoOperationUpdater();
+
+
     public void updateQuality() {
         for (Item item : items) {
-            if (item.name.equals(SULFURAS)) {
-                continue;
-            }
-            item.sellIn = item.sellIn - 1;
-            if (item.name.equals(BACKSTAGE_TAFKA_CONCERT)) {
-                if (item.sellIn >= 0) {
-                    this.upgradeQualityConcert(item);
-                } else {
-                    item.quality = 0;
-                }
-
-            } else if (item.name.equals(AGED_BRIE)) {
-                this.upgradeQuality(item);
-            } else {
-                this.degradeQuality(item);
-            }
-
+            this.updaterFor(item.name).updateItem(item);
         }
     }
 
-
-    private void upgradeQuality(Item item) {
-        int qualityGained = item.sellIn < 0 ? 2 : 1;
-        item.quality = Math.min(50, item.quality + qualityGained);
+    private ItemUpdater updaterFor(String name) {
+       return switch (name) {
+           case SULFURAS -> SULFURAS_UPDATER;
+           case AGED_BRIE -> AGED_BRIE_UPDATER;
+           case BACKSTAGE_TAFKA_CONCERT -> BACKSTAGE_CONCERT_UPDATER;
+           default ->
+                name.toLowerCase(Locale.ROOT).contains(CONJURED)
+                    ? CONJURED_UPDATER
+                    :  STANDARD_UPDATER;
+        };
 
     }
 
-    private void degradeQuality(Item item) {
-        int qualityLost = item.name.toLowerCase(Locale.ROOT).contains(CONJURED)
-            ? (item.sellIn < 0 ? 4 : 2)
-            : (item.sellIn < 0 ? 2 : 1);
-        item.quality = Math.max(0, item.quality - qualityLost);
-    }
-
-
-    private void upgradeQualityConcert(Item item) {
-        int qualityGained = item.sellIn < 5 ? 3 : item.sellIn < 10 ? 2 : 1;
-        item.quality = Math.min(50, item.quality + qualityGained);
-    }
 }
